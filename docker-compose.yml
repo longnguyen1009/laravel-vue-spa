@@ -1,0 +1,35 @@
+version: '3.6'
+services:
+  pgsql:
+    build: ./.docker/pgsql
+    image: agw_kumon_pgsql
+    ports:
+      - '5432:5432'
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=spa_advertise
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    networks:
+      - backend
+    restart: unless-stopped
+  webserver:
+    build: ./.docker/php
+    image: agw_kumon_web
+    privileged: true
+    stdin_open: true
+    ports:
+      - '80:80'
+#      - '443:443'
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - backend
+    depends_on:
+      - pgsql
+networks:
+  backend:
+
+volumes:
+  db-data:
